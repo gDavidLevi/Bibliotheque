@@ -1,0 +1,36 @@
+<%@page import="ru.davidlevi.jsp.web.beans.Genre"%>
+
+<%@page pageEncoding="UTF-8" %>
+
+<div class="genrebar">
+    <h4>Жанры:</h4>
+    <ul class="nav">
+        <!--Бин "Жанры". Область видимости - всё приложение-->
+        <jsp:useBean id="genreList" class="ru.davidlevi.jsp.web.beans.GenreList" scope="application"/>
+
+        <%  long selectedGenreId = 0;
+            // Если параметр запроса не пустой, то получить параметр из запроса
+            if (request.getParameter("genre_id") != null) {
+                selectedGenreId = Long.valueOf(request.getParameter("genre_id"));
+            } else // иначе если атрибут сессии на пустой, то получить значение из атрибута
+            if (session.getAttribute("genre_id") != null) {
+                selectedGenreId = Long.valueOf(session.getAttribute("genreId").toString());
+            }
+            // Установить атрибут сессии
+            session.setAttribute("genreId", selectedGenreId);
+        %>
+
+        <!--Значение 0 - все книги-->
+        <li><a href="books.jsp?genre_id=0">Все книги</a></li>
+
+        <%  // Создадим список из жанров
+            for (Genre genre : genreList.getGenreList()) {
+                // Если выбран жанр, то установим стиль "color:red;" на сам жанр
+                if (selectedGenreId != 0 && selectedGenreId == genre.getId()) {%>
+        <li><a style="color:red;" href="books.jsp?genre_id=<%=genre.getId()%>"><%=genre.getName()%></a></li>
+            <% } else {%>
+        <li><a href="books.jsp?genre_id=<%=genre.getId()%>"><%=genre.getName()%></a></li>
+            <% }
+                }%> 
+    </ul>
+</div>

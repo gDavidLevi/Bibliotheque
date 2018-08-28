@@ -1,0 +1,55 @@
+<%@ page pageEncoding="UTF-8" %>
+
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Онлайн библиотека</title>
+        <link href="../css/style_pages.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <%  request.setCharacterEncoding("UTF-8"); // UTF-8
+            String searchString = "";
+            // Сохраним строку поиска в атрибуте сессии, если поисковая строка не пуста
+            if (request.getParameter("search_string") != null) {
+                searchString = request.getParameter("search_string");
+                session.setAttribute("search_string", searchString);
+            }
+            // Если в сессии была сохранена строка поиска, то восстановим её
+            if (session.getAttribute("search_string") != null) {
+                searchString = session.getAttribute("search_string").toString();
+            } else {
+                session.setAttribute("search_string", searchString);
+            }
+            // Если получили имя пользователя, то сохраним его как атрибут
+            if (request.getParameter("username") != null) {
+                session.setAttribute("username", request.getParameter("username"));
+            }%>
+
+        <div class="main">
+            
+            <div class="header">
+                <div class="logo">
+                    <a href="main.jsp"><img src="../images/library.png" alt="Логотип" name="logo" /></a>
+                </div>
+                
+                <div class="description">
+                    <h1>Онлайн библиотека</h1>
+                </div>
+                
+                <div class="welcome">
+                    <h3>Добро пожаловать, <%=session.getAttribute("username")%>!</h3>
+                    <!-- Выход из сессии или анулировать текущую и запросить новую -->
+                    <h3><a href="../index.jsp?session=0">Выход</a></h3>
+                </div>
+                    
+                <div class="search_form">
+                    <form name="search_form" method="GET" action="books.jsp">
+                        <input type="text" name="search_string" value="<%=searchString%>" size="90"/>
+                        <input class="search_button" type="submit" value="Поиск"/>
+                        <select name="search_option">
+                            <option>Название</option>
+                            <option>Автор</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
