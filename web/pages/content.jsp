@@ -28,8 +28,7 @@
                 <%
                     String pathContext = request.getContextPath(); // строка "/Bibliotheque10"
                     String index = request.getParameter("index");
-                    String sessionId = request.getSession().getId();
-                    System.out.printf("%s %s %s", pathContext, index, sessionId);
+                    String sessionId = request.getSession().getId(); 
                 %>
 
                 <param name="pdf" value="<%=pathContext%>/PdfContent?index=<%=index%>&session_id=<%=sessionId%>"/> 
