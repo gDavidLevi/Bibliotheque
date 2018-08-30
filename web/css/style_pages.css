@@ -203,7 +203,7 @@ ul.nav a:hover, ul.nav a:active, ul.nav a:focus {
     font-weight: bold;
 }
 
-.pdf_viewer {
+.embedpdf_viewer {
     margin: 0 auto;
     width: 850px;
     margin-top: 30px;

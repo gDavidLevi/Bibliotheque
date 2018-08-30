@@ -25,8 +25,19 @@ public class PdfContent extends HttpServlet {
         try {
             // Получить индекс картинки из параметра запроса
             int index = Integer.valueOf(request.getParameter("index"));
-            // Обратимся к списку отобранных книг через глобальный атрибут currentBookList
-            ArrayList<Book> list = (ArrayList<Book>) request.getSession(false).getAttribute("currentBookList");
+
+//            // Получаем сессию из карты сессии (все сессии внутри web-контейнера)
+//            HashMap sessionMap = (HashMap) getServletContext().getAttribute("sessionMap");
+//            // Необходимая сессия
+//            HttpSession session = (HttpSession) sessionMap.get(request.getParameter("session_id"));
+//            // Обратимся к списку отобранных книг через глобальный атрибут currentBookList
+//            ArrayList<Book> list = (ArrayList<Book>) session.getAttribute("currentBookList");
+
+            /**/
+            ArrayList<Book> list = (ArrayList<Book>) request
+                    // getSession(false) - если сессии нет, то она не будет создаваться потому, что нам не нужно несколько разных сессий.
+                    .getSession(false)
+                    .getAttribute("currentBookList");
             // Возьмем из списка книгу по индексу
             Book book = list.get(index);
             // Метод наполняет книгу содержимым ИМЕННО тогда, когда к ней обратились!

@@ -76,7 +76,7 @@
             <br><strong>Год издания:</strong> <%=book.getPublishDate()%>
             <br><strong>Автор:</strong> <%=book.getAuthor()%>
             <p style="margin:10px;">
-                <a href="<%=pathContext%>/PdfContent?index=<%=index%>" target="_blank">Читать</a>
+                <a href="<%=pathContext%>/content.jsp?index=<%=index%>" target="_blank">Читать используя плаггин EmbedPDF</a>
             </p>
         </div>
     </div> 

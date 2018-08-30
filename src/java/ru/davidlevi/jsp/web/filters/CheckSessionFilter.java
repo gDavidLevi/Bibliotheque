@@ -26,8 +26,22 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.http.HttpSession;
 
 /**
+ * Фильтр проверки сессии
+ * <p>
+ * Добавлено в web.xml:
+ * <filter>
+ * <!-- Время сессии пользователя -->
+ * <description>См.
+ * ru.davidlevi.jsp.web.filters.CheckSessionFilter</description>
+ * <filter-name>CheckSessionFilter</filter-name>
+ * <filter-class>ru.davidlevi.jsp.web.filters.CheckSessionFilter</filter-class>
+ * </filter>
+ * <filter-mapping>
+ * <filter-name>CheckSessionFilter</filter-name>
+ * <url-pattern>/pages/*</url-pattern>
+ * </filter-mapping>
  *
- * @author Tim
+ * @author david
  */
 public class CheckSessionFilter implements Filter {
 
@@ -38,6 +52,76 @@ public class CheckSessionFilter implements Filter {
     private FilterConfig filterConfig = null;
 
     public CheckSessionFilter() {
+    }
+
+    /**
+     * Init method for this filter
+     */
+    public void init(FilterConfig filterConfig) {
+        this.filterConfig = filterConfig;
+        if (filterConfig != null) {
+            if (debug) {
+                log("CheckSessionFilter: Initializing filter");
+            }
+        }
+    }
+
+    /**
+     *
+     * @param request The servlet request we are processing
+     * @param response The servlet response we are creating
+     * @param chain The filter chain we are processing
+     *
+     * @exception IOException if an input/output error occurs
+     * @exception ServletException if a servlet error occurs
+     */
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        if (debug) {
+            log("CheckSessionFilter:doFilter()");
+        }
+
+        // Create wrappers for the request and response objects.
+        // Using these, you can extend the capabilities of the
+        // request and response, for example, allow setting parameters
+        // on the request before sending the request to the rest of the filter chain,
+        // or keep track of the cookies that are set on the response.
+        //
+        // Caveat: some servers do not handle wrappers very well for forward or
+        // include requests.
+        RequestWrapper wrappedRequest = new RequestWrapper((HttpServletRequest) request);
+        ResponseWrapper wrappedResponse = new ResponseWrapper((HttpServletResponse) response);
+
+        doBeforeProcessing(wrappedRequest, wrappedResponse);
+
+        Throwable problem = null;
+
+        // false - если сессии нет, то она не будет создаваться потому, что нам не нужно несколько разных сессий.
+        HttpSession session = wrappedRequest.getSession(false);
+        if (session == null || session.isNew()) {
+            wrappedResponse.sendRedirect(wrappedRequest.getContextPath() + "/index.jsp");
+        } else {
+            chain.doFilter(wrappedRequest, wrappedResponse);
+        }
+
+        doAfterProcessing(wrappedRequest, wrappedResponse);
+
+        // If there was a problem, we want to rethrow it if it is
+        // a known type, otherwise log it.
+        if (problem != null) {
+            if (problem instanceof ServletException) {
+                throw (ServletException) problem;
+            }
+            if (problem instanceof IOException) {
+                throw (IOException) problem;
+            }
+            sendProcessingError(problem, response);
+        }
+    }
+    
+    /**
+     * Destroy method for this filter
+     */
+    public void destroy() {
     }
 
     private void doBeforeProcessing(RequestWrapper request, ResponseWrapper response) throws IOException, ServletException {
@@ -119,57 +203,6 @@ public class CheckSessionFilter implements Filter {
     }
 
     /**
-     *
-     * @param request The servlet request we are processing
-     * @param response The servlet response we are creating
-     * @param chain The filter chain we are processing
-     *
-     * @exception IOException if an input/output error occurs
-     * @exception ServletException if a servlet error occurs
-     */
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        if (debug) {
-            log("CheckSessionFilter:doFilter()");
-        }
-
-        // Create wrappers for the request and response objects.
-        // Using these, you can extend the capabilities of the
-        // request and response, for example, allow setting parameters
-        // on the request before sending the request to the rest of the filter chain,
-        // or keep track of the cookies that are set on the response.
-        //
-        // Caveat: some servers do not handle wrappers very well for forward or
-        // include requests.
-        RequestWrapper wrappedRequest = new RequestWrapper((HttpServletRequest) request);
-        ResponseWrapper wrappedResponse = new ResponseWrapper((HttpServletResponse) response);
-
-        doBeforeProcessing(wrappedRequest, wrappedResponse);
-
-        Throwable problem = null;
-
-        HttpSession session = wrappedRequest.getSession(false);
-        if (session == null || session.isNew()) {
-            wrappedResponse.sendRedirect(wrappedRequest.getContextPath() + "/index.jsp");
-        } else {
-            chain.doFilter(wrappedRequest, wrappedResponse);
-        }
-
-        doAfterProcessing(wrappedRequest, wrappedResponse);
-
-        // If there was a problem, we want to rethrow it if it is
-        // a known type, otherwise log it.
-        if (problem != null) {
-            if (problem instanceof ServletException) {
-                throw (ServletException) problem;
-            }
-            if (problem instanceof IOException) {
-                throw (IOException) problem;
-            }
-            sendProcessingError(problem, response);
-        }
-    }
-
-    /**
      * Return the filter configuration object for this filter.
      */
     public FilterConfig getFilterConfig() {
@@ -183,24 +216,6 @@ public class CheckSessionFilter implements Filter {
      */
     public void setFilterConfig(FilterConfig filterConfig) {
         this.filterConfig = filterConfig;
-    }
-
-    /**
-     * Destroy method for this filter
-     */
-    public void destroy() {
-    }
-
-    /**
-     * Init method for this filter
-     */
-    public void init(FilterConfig filterConfig) {
-        this.filterConfig = filterConfig;
-        if (filterConfig != null) {
-            if (debug) {
-                log("CheckSessionFilter: Initializing filter");
-            }
-        }
     }
 
     /**
