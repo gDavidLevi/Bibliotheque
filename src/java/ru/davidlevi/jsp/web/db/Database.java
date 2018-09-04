@@ -35,7 +35,7 @@ public class Database {
              user=root
              password=******** 
             */
-            ds = (DataSource) ic.lookup("jdbc/Library"); 
+            ds = (DataSource) ic.lookup("jdbc/library"); 
             conn = ds.getConnection();
         } catch (SQLException ex) {
             Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
